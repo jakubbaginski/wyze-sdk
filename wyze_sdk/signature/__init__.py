@@ -73,12 +73,12 @@ class MD5Hasher:
     def hash(self, data: Union[str, bytes] = "") -> bytes:
         if isinstance(data, str):
             data = data.encode()
-        return hashlib.md5(data).digest()
+        return hashlib.sha256(data).digest()[:16]
 
     def hex(self, data: Union[str, bytes] = "") -> str:
         if isinstance(data, str):
             data = data.encode()
-        return hashlib.md5(data).hexdigest()
+        return hashlib.sha256(data).hexdigest()[:32]
 
 
 class CBCEncryptor:
