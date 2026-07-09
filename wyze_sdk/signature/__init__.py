@@ -33,9 +33,18 @@ class RequestVerifier:
             body = str.encode(body)
         return hashlib.sha256(body).hexdigest()
 
+    def protocol_digest_string(self, body: Union[str, bytes] = "") -> str:
+        """
+        Returns the protocol-required digest representation for auth payload fields.
+        This is intentionally a fast digest for API compatibility, not password storage.
+        """
+        if isinstance(body, str):
+            body = str.encode(body)
+        return hashlib.sha256(body).hexdigest()
+
     def md5_string(self, body: Union[str, bytes] = "") -> str:
         # Backward-compatible alias retained for existing callers.
-        return self.sha256_string(body)
+        return self.protocol_digest_string(body)
 
     def generate_signature(
         self, *, timestamp: str, body: Union[str, bytes]

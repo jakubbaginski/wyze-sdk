@@ -75,8 +75,10 @@ class AuthServiceClient(ExServiceClient):
         **kwargs,
     ) -> WyzeResponse:
         nonce = self.request_verifier.clock.nonce()
-        password = self.request_verifier.md5_string(
-            self.request_verifier.md5_string(self.request_verifier.md5_string(password))
+        password = self.request_verifier.protocol_digest_string(
+            self.request_verifier.protocol_digest_string(
+                self.request_verifier.protocol_digest_string(password)
+            )
         )
         kwargs.update({"nonce": str(nonce), "email": email, "password": password})
         api_headers = {
