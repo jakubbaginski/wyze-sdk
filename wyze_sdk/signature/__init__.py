@@ -24,14 +24,18 @@ class RequestVerifier:
 
     def request_id(self, timestamp: Optional[int] = None):
         if timestamp is not None:
-            return self.md5_string(str(self.md5_string(timestamp)))
+            return self.sha256_string(str(self.sha256_string(timestamp)))
 
-        return self.md5_string(self.md5_string(str(self.clock.nonce())))
+        return self.sha256_string(self.sha256_string(str(self.clock.nonce())))
 
-    def md5_string(self, body: Union[str, bytes] = "") -> str:
+    def sha256_string(self, body: Union[str, bytes] = "") -> str:
         if isinstance(body, str):
             body = str.encode(body)
-        return hashlib.md5(body).hexdigest()
+        return hashlib.sha256(body).hexdigest()
+
+    def md5_string(self, body: Union[str, bytes] = "") -> str:
+        # Backward-compatible alias retained for existing callers.
+        return self.sha256_string(body)
 
     def generate_signature(
         self, *, timestamp: str, body: Union[str, bytes]
@@ -46,7 +50,7 @@ class RequestVerifier:
 
         format_req = str.encode(f"{body}")
         encoded_secret = str.encode(self.signing_secret)
-        request_hash = hmac.new(encoded_secret, format_req, hashlib.md5).hexdigest()
+        request_hash = hmac.new(encoded_secret, format_req, hashlib.sha256).hexdigest()
         calculated_signature = f"{request_hash}"
         return calculated_signature
 
@@ -62,8 +66,8 @@ class RequestVerifier:
             body = body.decode("utf-8")
 
         format_req = str.encode(f"{body}")
-        encoded_secret = str.encode(self.md5_string(f"{self.access_token}{self.signing_secret}"))
-        request_hash = hmac.new(encoded_secret, format_req, hashlib.md5).hexdigest()
+        encoded_secret = str.encode(self.sha256_string(f"{self.access_token}{self.signing_secret}"))
+        request_hash = hmac.new(encoded_secret, format_req, hashlib.sha256).hexdigest()
         calculated_signature = f"{request_hash}"
         return calculated_signature
 
@@ -73,12 +77,12 @@ class MD5Hasher:
     def hash(self, data: Union[str, bytes] = "") -> bytes:
         if isinstance(data, str):
             data = data.encode()
-        return hashlib.md5(data).digest()
+        return hashlib.sha256(data).digest()
 
     def hex(self, data: Union[str, bytes] = "") -> str:
         if isinstance(data, str):
             data = data.encode()
-        return hashlib.md5(data).hexdigest()
+        return hashlib.sha256(data).hexdigest()
 
 
 class CBCEncryptor:
