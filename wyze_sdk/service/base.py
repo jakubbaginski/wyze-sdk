@@ -81,8 +81,9 @@ class BaseServiceClient(metaclass=ABCMeta):
             request: requests.Request) -> WyzeResponse:
         try:
             self._logger.info(f"requesting {request.method} to {request.url}")
-            self._logger.debug(f"headers: {request.headers}")
-            self._logger.debug(f"body: {request.body}")
+            self._logger.debug(f"header keys: {list(request.headers.keys()) if request.headers else []}")
+            body_length = len(request.body) if request.body is not None else 0
+            self._logger.debug(f"body present: {request.body is not None}, body length: {body_length}")
 
             settings = session.merge_environment_settings(request.url, {}, None, None, None)
 
