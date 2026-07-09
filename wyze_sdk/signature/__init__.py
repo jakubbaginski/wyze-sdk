@@ -70,15 +70,30 @@ class RequestVerifier:
 
 class MD5Hasher:
 
+    _PBKDF2_SALT = b"wyze-sdk-password-kdf"
+    _PBKDF2_ITERATIONS = 200000
+
     def hash(self, data: Union[str, bytes] = "") -> bytes:
         if isinstance(data, str):
             data = data.encode()
-        return hashlib.sha256(data).digest()[:16]
+        return hashlib.pbkdf2_hmac(
+            "sha256",
+            data,
+            self._PBKDF2_SALT,
+            self._PBKDF2_ITERATIONS,
+            dklen=16,
+        )
 
     def hex(self, data: Union[str, bytes] = "") -> str:
         if isinstance(data, str):
             data = data.encode()
-        return hashlib.sha256(data).hexdigest()[:32]
+        return hashlib.pbkdf2_hmac(
+            "sha256",
+            data,
+            self._PBKDF2_SALT,
+            self._PBKDF2_ITERATIONS,
+            dklen=16,
+        ).hex()
 
 
 class CBCEncryptor:
