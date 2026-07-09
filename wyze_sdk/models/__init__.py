@@ -48,12 +48,12 @@ def show_unknown_key_warning(name: Union[str, object], others: dict):
     if "product_type" in others:
         others.pop("product_type")
     if len(others) > 0:
-        keys = ", ".join(others.keys())
+        ignored_count = len(others)
         logger = logging.getLogger(__name__)
         if isinstance(name, object):
             name = name.__class__.__name__
         logger.debug(
-            f"!!! {name}'s constructor args ({keys}) were ignored."
+            f"!!! {name}'s constructor had {ignored_count} ignored args."
             f" If they should be supported by this library, report this issue to the project"
             f" https://github.com/shauntarves/wyze-sdk/issues"
         )
