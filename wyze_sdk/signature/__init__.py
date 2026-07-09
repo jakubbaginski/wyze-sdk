@@ -72,7 +72,7 @@ class RequestVerifier:
         return calculated_signature
 
 
-class MD5Hasher:
+class SHA256Hasher:
 
     def hash(self, data: Union[str, bytes] = "") -> bytes:
         if isinstance(data, str):
@@ -83,6 +83,11 @@ class MD5Hasher:
         if isinstance(data, str):
             data = data.encode()
         return hashlib.sha256(data).hexdigest()
+
+
+class MD5Hasher(SHA256Hasher):
+    # Backward-compatible alias retained for existing callers.
+    pass
 
 
 class CBCEncryptor:

@@ -12,7 +12,7 @@ from wyze_sdk.errors import WyzeClientConfigurationError, WyzeRequestError
 from wyze_sdk.models.devices import Device, DeviceParser
 from wyze_sdk.service import (ApiServiceClient, AuthServiceClient,
                               PlatformServiceClient, WyzeResponse)
-from wyze_sdk.signature import MD5Hasher
+from wyze_sdk.signature import SHA256Hasher
 
 
 class Client(object):
@@ -241,8 +241,8 @@ class Client(object):
             raise WyzeRequestError("Old and new passwords must be different")
 
         return self._api_client().change_password(
-            old_password=MD5Hasher().hex(MD5Hasher().hex(old_password)),
-            new_password=MD5Hasher().hex(MD5Hasher().hex(new_password)),
+            old_password=SHA256Hasher().hex(SHA256Hasher().hex(old_password)),
+            new_password=SHA256Hasher().hex(SHA256Hasher().hex(new_password)),
         )
 
     def devices_list(self, **kwargs) -> Sequence[Device]:
