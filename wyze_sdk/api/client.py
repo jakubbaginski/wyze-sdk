@@ -1,3 +1,4 @@
+import hashlib
 import logging
 from typing import Optional, Sequence
 
@@ -12,7 +13,6 @@ from wyze_sdk.errors import WyzeClientConfigurationError, WyzeRequestError
 from wyze_sdk.models.devices import Device, DeviceParser
 from wyze_sdk.service import (ApiServiceClient, AuthServiceClient,
                               PlatformServiceClient, WyzeResponse)
-from wyze_sdk.signature import MD5Hasher
 
 
 class Client(object):
@@ -240,9 +240,18 @@ class Client(object):
         if new_password == old_password:
             raise WyzeRequestError("Old and new passwords must be different")
 
+        old_password_hash = hashlib.md5(
+            hashlib.md5(old_password.encode("utf-8"), usedforsecurity=False).hexdigest().encode("utf-8"),
+            usedforsecurity=False,
+        ).hexdigest()
+        new_password_hash = hashlib.md5(
+            hashlib.md5(new_password.encode("utf-8"), usedforsecurity=False).hexdigest().encode("utf-8"),
+            usedforsecurity=False,
+        ).hexdigest()
+
         return self._api_client().change_password(
-            old_password=MD5Hasher().hex(MD5Hasher().hex(old_password)),
-            new_password=MD5Hasher().hex(MD5Hasher().hex(new_password)),
+            old_password=old_password_hash,
+            new_password=new_password_hash,
         )
 
     def devices_list(self, **kwargs) -> Sequence[Device]:
